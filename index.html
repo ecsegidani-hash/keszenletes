@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Készenlétes Karbantartó</title>
+
+    <style>
+        html, body {
+            margin: 0;
+            width: 100%;
+            height: 100%;
+            background: #003366;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            width: 100%;
+            padding: 25px;
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        .title {
+            margin-bottom: 40px;
+            font-size: 8vw;
+            font-weight: bold;
+        }
+
+        .name {
+            margin-bottom: 30px;
+            font-size: 14vw;
+            line-height: 1.1;
+            font-weight: bold;
+        }
+
+        .phone {
+            font-size: 10vw;
+        }
+
+        .phone a {
+            color: white;
+            text-decoration: none;
+        }
+
+        .week {
+            margin-top: 35px;
+            font-size: 5vw;
+            line-height: 1.4;
+            color: #d0d0d0;
+        }
+
+        @media screen and (orientation: landscape) {
+            .title {
+                font-size: 4vw;
+                margin-bottom: 25px;
+            }
+
+            .name {
+                font-size: 8vw;
+                margin-bottom: 20px;
+            }
+
+            .phone {
+                font-size: 5vw;
+            }
+
+            .week {
+                margin-top: 25px;
+                font-size: 2.5vw;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="title">
+            AKTUÁLIS KÉSZENLÉTES
+        </div>
+
+        <div class="name" id="name">
+            Betöltés...
+        </div>
+
+        <div class="phone" id="phone"></div>
+
+        <div class="week" id="week"></div>
+    </div>
+
+    <script>
+        const workers = [
+            {
+                name: "Hámori Péter",
+                phone: "06305717661",
+                displayPhone: "06 30 571 7661"
+            },
+            {
+                name: "Kovács Gergő",
+                phone: "06309514365",
+                displayPhone: "06 30 951 4365"
+            },
+            {
+                name: "Ecsegi Csaba",
+                phone: "06309518912",
+                displayPhone: "06 30 951 8912"
+            },
+            {
+                name: "Kovács Lajos",
+                phone: "06204286244",
+                displayPhone: "06 20 428 6244"
+            }
+        ];
+
+        /*
+         * A ciklus kezdete:
+         * 2026. október 5., hétfő 07:00
+         */
+        const startDate = new Date(
+            2026,
+            9,
+            5,
+            7,
+            0,
+            0
+        );
+
+        function twoDigits(number) {
+            return number < 10 ? "0" + number : number;
+        }
+
+        function formatDate(date) {
+            const days = [
+                "vasárnap",
+                "hétfő",
+                "kedd",
+                "szerda",
+                "csütörtök",
+                "péntek",
+                "szombat"
+            ];
+
+            return (
+                date.getFullYear() + "." +
+                twoDigits(date.getMonth() + 1) + "." +
+                twoDigits(date.getDate()) + ". " +
+                days[date.getDay()] + " " +
+                twoDigits(date.getHours()) + ":" +
+                twoDigits(date.getMinutes())
+            );
+        }
+
+        function updateDuty() {
+            const now = new Date();
+
+            /*
+             * Eltelt teljes naptári hetek kiszámítása.
+             */
+            const currentDateNumber = Date.UTC(
+                now.getFullYear(),
+                now.getMonth(),
+                now.getDate(),
+                now.getHours(),
+                now.getMinutes()
+            );
+
+            const startDateNumber = Date.UTC(
+                startDate.getFullYear(),
+                startDate.getMonth(),
+                startDate.getDate(),
+                startDate.getHours(),
+                startDate.getMinutes()
+            );
+
+            const weekMilliseconds =
+                7 * 24 * 60 * 60 * 1000;
+
+            const passedWeeks = Math.floor(
+                (currentDateNumber - startDateNumber) /
+                weekMilliseconds
+            );
+
+            const index =
+                ((passedWeeks % workers.length) +
+                workers.length) %
+                workers.length;
+
+            const nextChange = new Date(
+                2026,
+                9,
+                5 + ((passedWeeks + 1) * 7),
+                7,
+                0,
+                0
+            );
+
+            document.getElementById("name").textContent =
+                workers[index].name;
+
+            document.getElementById("phone").innerHTML =
+                '<a href="tel:' +
+                workers[index].phone +
+                '">' +
+                workers[index].displayPhone +
+                '</a>';
+
+            document.getElementById("week").textContent =
+                "Következő váltás: " +
+                formatDate(nextChange);
+        }
+
+        updateDuty();
+
+        /*
+         * Percenként frissít.
+         */
+        setInterval(updateDuty, 60000);
+    </script>
+</body>
+</html>
